@@ -27,11 +27,13 @@ class Crontab
      *      |    |    +--------- hour (0 - 23)
      *      |    +----------- min (0 - 59)
      *      +------------- sec (0-59)
-     * @return array second 下一分钟内执行是否需要执行任务,如果需要,则把需要在哪几秒执行返回
+     * @param boolean $hide_past_sec 是否隐藏当前分钟内已经过去的 sec
+     *
+     * @return array second 当前分钟内执行是否需要执行任务,如果需要,则把需要在哪几秒执行返回
      *
      * @throws InvalidArgumentException 参数异常
      */
-    static public function parse($crontab_string)
+    static public function parse($crontab_string, $hide_past_sec = false)
     {
         if (!preg_match('/^((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)$/i', trim($crontab_string))) {
             if (!preg_match('/^((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)$/i', trim($crontab_string))) {
@@ -40,7 +42,7 @@ class Crontab
         }
         $cron = preg_split("/[\s]+/i", trim($crontab_string));
         if (count($cron) == 5) {
-            $cron[0] = 1;
+            array_unshift($cron, 1);
         }
         $start = time();
         $date = array(
@@ -51,17 +53,29 @@ class Crontab
             'month'   => self::_parseCronNumbers($cron[4], 1, 12),
             'week'    => self::_parseCronNumbers($cron[5], 0, 6),
         );
+
         if (
-            in_array(intval(date('i', $start)), $date['minutes']) &&
-            in_array(intval(date('G', $start)), $date['hours']) &&
-            in_array(intval(date('j', $start)), $date['day']) &&
-            in_array(intval(date('w', $start)), $date['week']) &&
-            in_array(intval(date('n', $start)), $date['month'])
+            !in_array(intval(date('i', $start)), $date['minutes']) ||
+            !in_array(intval(date('G', $start)), $date['hours']) ||
+            !in_array(intval(date('j', $start)), $date['day']) ||
+            !in_array(intval(date('w', $start)), $date['week']) ||
+            !in_array(intval(date('n', $start)), $date['month'])
 
         ) {
+            return array();
+        }
+        $currSec = date('s', $start);
+        if (!$hide_past_sec) {
             return $date['second'];
         }
-        return null;
+        foreach ($date['second'] as $k => $v) {
+            if ($k > $currSec) {
+                continue;
+            }
+            unset($date['second'][$k]);
+        }
+
+        return $date['second'];
     }
 
     /**
