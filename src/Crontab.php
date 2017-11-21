@@ -6,6 +6,8 @@
  *
  */
 
+namespace ParseCrontab;
+
 /**
  * Class Crontab
  */
