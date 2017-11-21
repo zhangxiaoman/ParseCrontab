@@ -1,0 +1,13 @@
+{
+    "name": "xiaoman/parse-crontab",
+    "description": "parse linux crontab & support sec",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "章小慢",
+            "email": "zzxiaoman@gmail.com"
+        }
+    ],
+    "require": {}
+}
