@@ -33,13 +33,13 @@ class Crontab
      *
      * @return array second 当前分钟内执行是否需要执行任务,如果需要,则把需要在哪几秒执行返回
      *
-     * @throws InvalidArgumentException 参数异常
+     * @throws \InvalidArgumentException 参数异常
      */
     static public function parse($crontab_string, $hide_past_sec = false)
     {
         if (!preg_match('/^((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)$/i', trim($crontab_string))) {
             if (!preg_match('/^((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)$/i', trim($crontab_string))) {
-                throw new InvalidArgumentException("Invalid cron string: " . $crontab_string);
+                throw new \InvalidArgumentException("Invalid cron string: " . $crontab_string);
             }
         }
         $cron = preg_split("/[\s]+/i", trim($crontab_string));
